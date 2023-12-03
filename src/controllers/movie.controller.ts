@@ -2,10 +2,10 @@ import { Request, Response } from 'express';
 import Movie, { IMovie } from '../models/movie';
 import axios from 'axios';
 
-// getmovies with trycatch
+// get popular movies 
 export const getMovies = async (req: Request, res: Response) => {
     try {
-        const response = await axios.get('https://api.themoviedb.org/3/movie/popular?api_key=YOUR_API_KEY');
+        const response = await axios.get('https://api.themoviedb.org/3/movie/popular?api_key=30cddc8f56542b9d585e5b5c035aab19');
         return res.status(200).json(response.data);
     } catch (error) {
         console.log(error);
@@ -17,8 +17,65 @@ export const getMovies = async (req: Request, res: Response) => {
 export const getMovie = async (req: Request, res: Response) => {
     try {
         const { movieId } = req.params;
-        const movie = await Movie.findById(movieId);
-        return res.status(200).json(movie);
+        const response = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}?api_key=30cddc8f56542b9d585e5b5c035aab19`);
+        return res.status(200).json(response.data);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+};
+
+// getmovies by genre with trycatch
+export const getMoviesByGenre = async (req: Request, res: Response) => {
+    try {
+        const { genre } = req.params;
+        const response = await axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=30cddc8f56542b9d585e5b5c035aab19&with_genres=${genre}`);
+        return res.status(200).json(response.data);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+};
+
+// getmovies by duration with trycatch
+export const getMoviesByDuration = async (req: Request, res: Response) => {
+    try {
+        const { duration } = req.params;
+        const response = await axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=30cddc8f56542b9d585e5b5c035aab19&with_runtime.gte=${duration}`);
+        return res.status(200).json(response.data);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+};
+
+// get top rated movies
+export const getTopRatedMovies = async (req: Request, res: Response) => {
+    try {
+        const response = await axios.get('https://api.themoviedb.org/3/movie/top_rated?api_key=30cddc8f56542b9d585e5b5c035aab19');
+        return res.status(200).json(response.data);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+};
+
+export const getActors = async (req: Request, res: Response) => {
+    try {
+        const response = await axios.get('https://api.themoviedb.org/3/search/multi?api_key=30cddc8f56542b9d585e5b5c035aab19&query=brad%20pitt');
+        return res.status(200).json(response.data);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+}
+
+// getMovieTrailer with trycatch
+export const getMovieTrailer = async (req: Request, res: Response) => {
+    try {
+        const { movieId } = req.params;
+        const response = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=30cddc8f56542b9d585e5b5c035aab19`);
+        return res.status(200).json(response.data);
     } catch (error) {
         console.log(error);
         return res.status(500).json(error);

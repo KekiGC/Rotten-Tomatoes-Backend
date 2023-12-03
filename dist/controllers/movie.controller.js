@@ -12,14 +12,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getRating = exports.addRating = exports.deleteMovie = exports.updateMovie = exports.createMovie = exports.getMovie = exports.getMovies = void 0;
+exports.addPublicRating = exports.deleteMovie = exports.getMovieTrailer = exports.getActors = exports.getTopRatedMovies = exports.getMoviesByDuration = exports.getMoviesByGenre = exports.getMovie = exports.getMovies = void 0;
 const movie_1 = __importDefault(require("../models/movie"));
-const user_1 = __importDefault(require("../models/user"));
-// getmovies with trycatch
+const axios_1 = __importDefault(require("axios"));
+// get popular movies 
 const getMovies = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const movies = yield movie_1.default.find();
-        return res.status(200).json(movies);
+        const response = yield axios_1.default.get('https://api.themoviedb.org/3/movie/popular?api_key=30cddc8f56542b9d585e5b5c035aab19');
+        return res.status(200).json(response.data);
     }
     catch (error) {
         console.log(error);
@@ -31,8 +31,8 @@ exports.getMovies = getMovies;
 const getMovie = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { movieId } = req.params;
-        const movie = yield movie_1.default.findById(movieId);
-        return res.status(200).json(movie);
+        const response = yield axios_1.default.get(`https://api.themoviedb.org/3/movie/${movieId}?api_key=30cddc8f56542b9d585e5b5c035aab19`);
+        return res.status(200).json(response.data);
     }
     catch (error) {
         console.log(error);
@@ -40,38 +40,68 @@ const getMovie = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.getMovie = getMovie;
-// createmovie with trycatch
-const createMovie = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// getmovies by genre with trycatch
+const getMoviesByGenre = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { title, synopsis, releaseYear } = req.body;
-        const newMovie = new movie_1.default({
-            title,
-            synopsis,
-            releaseYear,
-        });
-        yield newMovie.save();
-        return res.status(201).json(newMovie);
+        const { genre } = req.params;
+        const response = yield axios_1.default.get(`https://api.themoviedb.org/3/discover/movie?api_key=30cddc8f56542b9d585e5b5c035aab19&with_genres=${genre}`);
+        return res.status(200).json(response.data);
     }
     catch (error) {
         console.log(error);
         return res.status(500).json(error);
     }
 });
-exports.createMovie = createMovie;
-// updatemovie with trycatch
-const updateMovie = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.getMoviesByGenre = getMoviesByGenre;
+// getmovies by duration with trycatch
+const getMoviesByDuration = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { duration } = req.params;
+        const response = yield axios_1.default.get(`https://api.themoviedb.org/3/discover/movie?api_key=30cddc8f56542b9d585e5b5c035aab19&with_runtime.gte=${duration}`);
+        return res.status(200).json(response.data);
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+});
+exports.getMoviesByDuration = getMoviesByDuration;
+// get top rated movies
+const getTopRatedMovies = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const response = yield axios_1.default.get('https://api.themoviedb.org/3/movie/top_rated?api_key=30cddc8f56542b9d585e5b5c035aab19');
+        return res.status(200).json(response.data);
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+});
+exports.getTopRatedMovies = getTopRatedMovies;
+const getActors = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const response = yield axios_1.default.get('https://api.themoviedb.org/3/search/multi?api_key=30cddc8f56542b9d585e5b5c035aab19&query=brad%20pitt');
+        return res.status(200).json(response.data);
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+});
+exports.getActors = getActors;
+// getMovieTrailer with trycatch
+const getMovieTrailer = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { movieId } = req.params;
-        const { title, synopsis, releaseYear } = req.body;
-        const updatedMovie = yield movie_1.default.findByIdAndUpdate(movieId, { title, synopsis, releaseYear }, { new: true });
-        return res.status(200).json(updatedMovie);
+        const response = yield axios_1.default.get(`https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=30cddc8f56542b9d585e5b5c035aab19`);
+        return res.status(200).json(response.data);
     }
     catch (error) {
         console.log(error);
         return res.status(500).json(error);
     }
 });
-exports.updateMovie = updateMovie;
+exports.getMovieTrailer = getMovieTrailer;
 // deletemovie with trycatch
 const deleteMovie = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -85,29 +115,18 @@ const deleteMovie = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.deleteMovie = deleteMovie;
-// addRating with trycatch
-const addRating = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// add public rating with trycatch
+const addPublicRating = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { movieId } = req.params;
-        const { userId, rating } = req.body;
-        const user = yield user_1.default.findById(userId);
-        if (!user) {
-            return res.status(400).json({ msg: 'User not found' });
-        }
+        const { rating } = req.body;
         const movie = yield movie_1.default.findById(movieId);
-        if (!movie) {
-            return res.status(400).json({ msg: 'Movie not found' });
-        }
-        const newRating = {
-            userId,
-            rating,
-        };
-        movie.ratings.push(newRating);
-        let sum = 0;
-        movie.ratings.forEach((rating) => {
-            sum += rating.rating;
-        });
-        movie.averageRating = sum / movie.ratings.length;
+        if (!movie)
+            return res.status(404).json({ msg: 'Movie not found' });
+        const newAverage = (movie.publicRating.average * movie.publicRating.count + rating) /
+            (movie.publicRating.count + 1);
+        movie.publicRating.average = newAverage;
+        movie.publicRating.count++;
         yield movie.save();
         return res.status(200).json(movie);
     }
@@ -116,22 +135,5 @@ const addRating = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return res.status(500).json(error);
     }
 });
-exports.addRating = addRating;
-// getRating with trycatch
-const getRating = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { movieId } = req.params;
-        const { userId } = req.body;
-        const movie = yield movie_1.default.findById(movieId);
-        if (!movie) {
-            return res.status(400).json({ msg: 'Movie not found' });
-        }
-        const rating = movie.ratings.find((rating) => rating.userId == userId);
-        return res.status(200).json(rating);
-    }
-    catch (error) {
-        console.log(error);
-        return res.status(500).json(error);
-    }
-});
-exports.getRating = getRating;
+exports.addPublicRating = addPublicRating;
+// add critic rating with trycatch

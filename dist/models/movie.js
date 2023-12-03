@@ -3,14 +3,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const movieSchema = new mongoose_1.Schema({
     title: { type: String, required: true },
-    synopsis: { type: String, required: true },
-    releaseYear: { type: Number, required: true },
-    averageRating: { type: Number, default: 0 },
-    ratings: [
+    image: { type: String, required: true },
+    genre: { type: String, required: true },
+    description: { type: String, required: true },
+    trailer: { type: String, required: true },
+    publicRating: {
+        average: { type: Number, default: 0 },
+        count: { type: Number, default: 0 },
+    },
+    criticRating: {
+        average: { type: Number, default: 0 },
+        count: { type: Number, default: 0 },
+    },
+    comments: [
         {
-            userId: { type: mongoose_1.Schema.Types.ObjectId, ref: "User" },
-            rating: { type: Number, required: true },
+            user: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User' },
+            text: { type: String, required: false },
         },
     ],
 });
-exports.default = (0, mongoose_1.model)("Movie", movieSchema);
+exports.default = (0, mongoose_1.model)('Movie', movieSchema);

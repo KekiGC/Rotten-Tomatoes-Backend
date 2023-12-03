@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.editUser = exports.deleteUser = exports.changePassword = exports.signIn = exports.signUp = void 0;
+exports.deleteUser = exports.changePassword = exports.signIn = exports.signUp = void 0;
 const user_1 = __importDefault(require("../models/user"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = __importDefault(require("../config/config"));
@@ -22,14 +22,9 @@ function createToken(user) {
     });
 }
 const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!req.body.name ||
-        !req.body.lastname ||
-        !req.body.email ||
-        !req.body.password ||
-        !req.body.username) {
-        return res
-            .status(400)
-            .json({ msg: "Plase. Send your email, user and password" });
+    if (!req.body.name || !req.body.lastname || !req.body.email ||
+        !req.body.password || !req.body.username) {
+        return res.status(400).json({ msg: "Plase. Send your email, user and password" });
     }
     const user = yield user_1.default.findOne({ email: req.body.email });
     console.log(user);
@@ -114,22 +109,20 @@ const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 });
 exports.deleteUser = deleteUser;
 // editar un usuario
-const editUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { userId, username, bio } = req.body;
-        console.log(req.body);
-        const user = yield user_1.default.findById(userId);
-        if (!user) {
-            res.status(404).json({ message: "Usuario no encontrado" });
-            return;
-        }
-        // Actualizar el username y la bio del usuario
-        user.editProfile(username, bio);
-        res.json(user);
-    }
-    catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error al editar el usuario" });
-    }
-});
-exports.editUser = editUser;
+// export const editUser = async (req: Request, res: Response) => {
+//   try {
+//     const { userId, username, bio } = req.body;
+//     console.log(req.body);
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       res.status(404).json({ message: "Usuario no encontrado" });
+//       return;
+//     }
+//     // Actualizar el username y la bio del usuario
+//     user.editProfile(username, bio);
+//     res.json(user);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Error al editar el usuario" });
+//   }
+// };

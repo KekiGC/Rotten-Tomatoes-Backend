@@ -42,16 +42,16 @@ const userSchema = new mongoose_1.Schema({
         required: true,
         trim: true,
     },
-    bio: {
-        type: String,
-        required: false,
-        trim: true,
+    isCritic: {
+        type: Boolean,
+        default: false,
     },
-    profileImg: {
-        type: String,
-        required: false,
-        trim: true,
-    },
+    moviesRated: [
+        {
+            movie: { type: mongoose_1.Schema.Types.ObjectId, ref: "Movie" },
+            rating: { type: Number, required: true },
+        },
+    ],
 }, {
     versionKey: false,
     timestamps: true,
@@ -72,11 +72,12 @@ userSchema.methods.comparePassword = function (password) {
         return yield bcrypt_1.default.compare(password, this.password);
     });
 };
-userSchema.methods.editProfile = function (username, bio) {
-    return __awaiter(this, void 0, void 0, function* () {
-        this.username = username;
-        this.bio = bio;
-        yield this.save();
-    });
-};
+// userSchema.methods.editProfile = async function (
+//   username: string,
+//   bio: string
+// ): Promise<void> {
+//   this.username = username;
+//   this.bio = bio;
+//   await this.save();
+// };
 exports.default = (0, mongoose_1.model)("User", userSchema);

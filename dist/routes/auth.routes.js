@@ -7,5 +7,4 @@ router.post('/signup', user_controller_1.signUp);
 router.post('/signin', user_controller_1.signIn);
 router.post('/change-password', user_controller_1.changePassword);
 router.delete('/delete-user', user_controller_1.deleteUser);
-router.put('/edit-user', user_controller_1.editUser);
 exports.default = router;
