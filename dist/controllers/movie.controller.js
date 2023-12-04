@@ -31,8 +31,26 @@ exports.getMovies = getMovies;
 const getMovie = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { movieId } = req.params;
+        // Verificar si la película ya existe en la base de datos
+        //   const existingMovie = await Movie.findById(movieId);
+        //   if (existingMovie) {
+        //     return res.status(200).json(existingMovie);
+        //   }
+        // Obtener la película de la API
         const response = yield axios_1.default.get(`https://api.themoviedb.org/3/movie/${movieId}?api_key=30cddc8f56542b9d585e5b5c035aab19`);
-        return res.status(200).json(response.data);
+        const movieData = response.data;
+        //   const movieIdValue = new mongoose.Types.ObjectId(movieData.id)
+        //   // Guardar la película en la base de datos
+        //   const movie = new Movie({
+        //     _id: movieIdValue,
+        //     title: movieData.title,
+        //     image: `https://image.tmdb.org/t/p/w500${movieData.poster_path}`,
+        //     genre: movieData.genre_ids,
+        //     description: movieData.overview,
+        //     // Otros campos de la película
+        //   });
+        //   await movie.save();
+        return res.status(200).json(movieData);
     }
     catch (error) {
         console.log(error);
