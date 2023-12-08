@@ -2,7 +2,7 @@ import { Router } from 'express';
 const router = Router();
 
 import { getMovies, getMovie, deleteMovie, addPublicRating,
-getMoviesByGenre, getActors, getTopRatedMovies, getMoviesByDuration } from '../controllers/movie.controller';
+getMoviesByGenre, getActors, getTopRatedMovies, getMoviesByDuration, getMovieByTitle } from '../controllers/movie.controller';
 
 
 // Routes
@@ -13,6 +13,7 @@ router.get('/movies/genre/:genre', getMoviesByGenre)
 router.get('/movies/duration/:duration', getMoviesByDuration)
 router.get('/movies/rating/toprated', getTopRatedMovies)
 router.get('/actors', getActors)
+router.get('/movie/:title', getMovieByTitle);
 
 router.delete('/movies/:movieId', deleteMovie)
 router.post('/movies/:movieId/rating', addPublicRating)
