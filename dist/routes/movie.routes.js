@@ -11,6 +11,9 @@ router.get('/movies/genre/:genre', movie_controller_1.getMoviesByGenre);
 router.get('/movies/duration/:duration', movie_controller_1.getMoviesByDuration);
 router.get('/movies/rating/toprated', movie_controller_1.getTopRatedMovies);
 router.get('/actors', movie_controller_1.getActors);
+// Posts
+router.post('/movies/:movieId/comment', movie_controller_1.addComment);
+router.post('/movies/:movieId/rating/public', movie_controller_1.addPublicRating);
+router.post('/movies/:movieId/rating/critic', movie_controller_1.addCriticRating);
 router.delete('/movies/:movieId', movie_controller_1.deleteMovie);
-router.post('/movies/:movieId/rating', movie_controller_1.addPublicRating);
 exports.default = router;

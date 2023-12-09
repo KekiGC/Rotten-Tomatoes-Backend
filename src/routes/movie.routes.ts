@@ -1,8 +1,9 @@
 import { Router } from 'express';
 const router = Router();
 
-import { getMovies, getMovie, deleteMovie, addPublicRating,
-getMoviesByGenre, getActors, getTopRatedMovies, getMoviesByDuration } from '../controllers/movie.controller';
+import { getMovies, getMovie, deleteMovie, addPublicRating, addCriticRating,
+getMoviesByGenre, getActors, getTopRatedMovies, getMoviesByDuration,
+addComment } from '../controllers/movie.controller';
 
 
 // Routes
@@ -14,7 +15,11 @@ router.get('/movies/duration/:duration', getMoviesByDuration)
 router.get('/movies/rating/toprated', getTopRatedMovies)
 router.get('/actors', getActors)
 
+// Posts
+router.post('/movies/:movieId/comment', addComment)
+router.post('/movies/:movieId/rating/public', addPublicRating)
+router.post('/movies/:movieId/rating/critic', addCriticRating)
+
 router.delete('/movies/:movieId', deleteMovie)
-router.post('/movies/:movieId/rating', addPublicRating)
 
 export default router;
