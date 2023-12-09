@@ -16,10 +16,24 @@ export const getMovies = async (req: Request, res: Response) => {
   }
 };
 
+// get latest movies
+export const getLatestMovies = async (req: Request, res: Response) => {
+  try {
+    const response = await axios.get(
+      "https://api.themoviedb.org/3/movie/latest?api_key=30cddc8f56542b9d585e5b5c035aab19"
+    );
+    return res.status(200).json(response.data);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+};
+
 // getmovie with trycatch
 export const getMovie = async (req: Request, res: Response) => {
   try {
     const { movieId } = req.params;
+
     // Verificar si la película ya existe en la base de datos
     const existingMovie = await Movie.findOne({apiId: movieId});
     if (existingMovie) {
@@ -39,7 +53,7 @@ export const getMovie = async (req: Request, res: Response) => {
 
       // Guardar la película en la base de datos
       const movie = new Movie({
-        apiId: movieData.id,
+        apiId: movieId,
         title: movieData.title,
         image: `https://image.tmdb.org/t/p/w500${movieData.poster_path}`,
         genres: genres,
@@ -135,65 +149,51 @@ export const deleteMovie = async (req: Request, res: Response) => {
   }
 };
 
-// add public rating with trycatch
-export const addPublicRating = async (req: Request, res: Response) => {
-  try {
-    const { movieId } = req.params;
-    const { rating } = req.body;
-    const movie = await Movie.findOne({ apiId: movieId });
-    if (!movie) return res.status(404).json({ msg: "Movie not found" });
-
-    // validar que el rating sea un número entre 1 y 5
-    if (rating < 1 || rating > 5) 
-    return res.status(400).json({ msg: "Rating must be between 1 and 5" });
-
-    const newAverage =
-      (movie.publicRating.average * movie.publicRating.count + rating) /
-      (movie.publicRating.count + 1);
-    movie.publicRating.average = newAverage;
-    movie.publicRating.count++;
-    await movie.save();
-    return res.status(200).json(movie);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-};
-
-// add critic rating with trycatch
-export const addCriticRating = async (req: Request, res: Response) => {
-  try {
-    const { movieId } = req.params;
-    const { rating, userId } = req.body;
-
-    const movie = await Movie.findOne({ apiId: movieId });
-    if (!movie) {
+export const addRating = async (req: Request, res: Response) => {
+    try {
+      const { movieId } = req.params;
+      const { rating, userId } = req.body;
+  
+      const movie = await Movie.findOne({ apiId: movieId });
+      if (!movie) {
         return res.status(404).json({ msg: "Movie not found" });
-    }
-
-    // validar que el rating sea un número entre 1 y 5
-    if (rating < 1 || rating > 5) {
+      }
+  
+      // Validar que el rating sea un número entre 1 y 5
+      if (rating < 1 || rating > 5) {
         return res.status(400).json({ msg: "Rating must be between 1 and 5" });
+      }
+  
+      if (userId) {
+        // Si se proporciona el ID del usuario, verificar si es crítico
+        const user = await User.findById(userId);
+        if (!user?.isCritic) {
+          return res
+            .status(401)
+            .json({ msg: "Only critics can add critic ratings" });
+        }
+  
+        const newAverage =
+          (movie.criticRating.average * movie.criticRating.count + rating) /
+          (movie.criticRating.count + 1);
+        movie.criticRating.average = newAverage;
+        movie.criticRating.count++;
+      } else {
+        // Si no se proporciona el ID del usuario, utilizar rating público
+        const newAverage =
+          (movie.publicRating.average * movie.publicRating.count + rating) /
+          (movie.publicRating.count + 1);
+        movie.publicRating.average = newAverage;
+        movie.publicRating.count++;
+      }
+  
+      await movie.save();
+      return res.status(200).json(movie);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(error);
     }
-
-    // validar que el usuario sea crítico
-    const user = await User.findById(userId);
-    if (!user?.isCritic) {
-        return res.status(401).json({ msg: "Only critics can add critic ratings" })
-    }
-
-    const newAverage =
-      (movie.criticRating.average * movie.criticRating.count + rating) /
-      (movie.criticRating.count + 1);
-    movie.criticRating.average = newAverage;
-    movie.criticRating.count++;
-    await movie.save();
-    return res.status(200).json(movie);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-};
+  };
 
 
 // add comment with trycatch
@@ -212,6 +212,18 @@ export const addComment = async (req: Request, res: Response) => {
   }
 };
 
+// get the comments of a movie
+export const getComments = async (req: Request, res: Response) => {
+    try {
+        const { movieId } = req.params;
+        const movie = await Movie.findOne({ apiId: movieId });
+        if (!movie) return res.status(404).json({ msg: "Movie not found" });
+        return res.status(200).json(movie.comments);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+}
 
 export const getMovieByTitle = async (req: Request, res: Response) => {
     try {
@@ -219,8 +231,7 @@ export const getMovieByTitle = async (req: Request, res: Response) => {
   
       const response = await axios.get(`https://api.themoviedb.org/3/search/movie?api_key=30cddc8f56542b9d585e5b5c035aab19&query=${encodeURIComponent(title)}`);
 
-      const movieData = response.data.results; // Obtener la primera película encontrada
-
+      const movieData = response.data.results; // array de películas
   
       if (!movieData) {
         return res.status(404).json({ msg: 'Movie not found' });
@@ -233,3 +244,16 @@ export const getMovieByTitle = async (req: Request, res: Response) => {
     }
   };
 
+// get movie reviews
+export const getMovieReviews = async (req: Request, res: Response) => {
+  try {
+    const { movieId } = req.params;
+    const response = await axios.get(
+      `https://api.themoviedb.org/3/movie/${movieId}/reviews?api_key=30cddc8f56542b9d585e5b5c035aab19`
+    );
+    return res.status(200).json(response.data);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+};
