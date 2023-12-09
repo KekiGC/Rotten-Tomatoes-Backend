@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addComment = exports.addCriticRating = exports.addPublicRating = exports.deleteMovie = exports.getMovieTrailer = exports.getActors = exports.getTopRatedMovies = exports.getMoviesByDuration = exports.getMoviesByGenre = exports.getMovie = exports.getMovies = void 0;
+exports.getMovieByTitle = exports.addComment = exports.addCriticRating = exports.addPublicRating = exports.deleteMovie = exports.getMovieTrailer = exports.getActors = exports.getTopRatedMovies = exports.getMoviesByDuration = exports.getMoviesByGenre = exports.getMovie = exports.getMovies = void 0;
 const movie_1 = __importDefault(require("../models/movie"));
 const user_1 = __importDefault(require("../models/user"));
 const axios_1 = __importDefault(require("axios"));
@@ -212,3 +212,19 @@ const addComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.addComment = addComment;
+const getMovieByTitle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { title } = req.params;
+        const response = yield axios_1.default.get(`https://api.themoviedb.org/3/search/movie?api_key=30cddc8f56542b9d585e5b5c035aab19&query=${encodeURIComponent(title)}`);
+        const movieData = response.data.results; // Obtener la primera película encontrada
+        if (!movieData) {
+            return res.status(404).json({ msg: 'Movie not found' });
+        }
+        return res.status(200).json(movieData);
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+});
+exports.getMovieByTitle = getMovieByTitle;

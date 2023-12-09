@@ -3,7 +3,7 @@ const router = Router();
 
 import { getMovies, getMovie, deleteMovie, addPublicRating, addCriticRating,
 getMoviesByGenre, getActors, getTopRatedMovies, getMoviesByDuration,
-addComment } from '../controllers/movie.controller';
+addComment, getMovieByTitle } from '../controllers/movie.controller';
 
 
 // Routes
@@ -13,6 +13,7 @@ router.get('/movies/:movieId', getMovie)
 router.get('/movies/genre/:genre', getMoviesByGenre)
 router.get('/movies/duration/:duration', getMoviesByDuration)
 router.get('/movies/rating/toprated', getTopRatedMovies)
+router.get('/movies/search/:title', getMovieByTitle)
 router.get('/actors', getActors)
 
 // Posts
