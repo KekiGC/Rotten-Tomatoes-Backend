@@ -195,6 +195,7 @@ export const addCriticRating = async (req: Request, res: Response) => {
   }
 };
 
+
 // add comment with trycatch
 export const addComment = async (req: Request, res: Response) => {
   try {
@@ -211,12 +212,15 @@ export const addComment = async (req: Request, res: Response) => {
   }
 };
 
+
 export const getMovieByTitle = async (req: Request, res: Response) => {
     try {
       const { title } = req.params;
   
       const response = await axios.get(`https://api.themoviedb.org/3/search/movie?api_key=30cddc8f56542b9d585e5b5c035aab19&query=${encodeURIComponent(title)}`);
+
       const movieData = response.data.results; // Obtener la primera película encontrada
+
   
       if (!movieData) {
         return res.status(404).json({ msg: 'Movie not found' });
@@ -228,3 +232,4 @@ export const getMovieByTitle = async (req: Request, res: Response) => {
       return res.status(500).json(error);
     }
   };
+
