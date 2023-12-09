@@ -1,10 +1,16 @@
 import { Document, Schema, model } from "mongoose";
 import { IUser } from "./user";
 
+interface IGenre {
+  id: number;
+  name: string;
+}
+
 export interface IMovie extends Document {
+  apiId: string;
   title: string;
   image: string;
-  genre: string;
+  genres: IGenre[];
   description: string;
   trailer: string;
   publicRating: {
@@ -22,11 +28,12 @@ export interface IMovie extends Document {
 }
 
 const movieSchema = new Schema<IMovie>({
+  apiId: { type: String, required: true, unique: true },
   title: { type: String, required: true },
   image: { type: String, required: true },
-  genre: { type: String, required: true },
+  genres: [{ id: Number, name: String }],
   description: { type: String, required: true },
-  trailer: { type: String, required: true },
+  trailer: { type: String, required: false },
   publicRating: {
     average: { type: Number, default: 0 },
     count: { type: Number, default: 0 },
