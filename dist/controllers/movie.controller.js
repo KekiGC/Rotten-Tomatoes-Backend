@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMovieReviews = exports.getMovieByTitle = exports.getComments = exports.addComment = exports.addRating = exports.deleteMovie = exports.getMovieTrailer = exports.getActors = exports.getTopRatedMovies = exports.getMoviesByDuration = exports.getMoviesByGenre = exports.getMovie = exports.getLatestMovies = exports.getMovies = void 0;
+exports.searchFilter = exports.getMovieReviews = exports.getMovieByTitle = exports.getComments = exports.addComment = exports.addRating = exports.deleteMovie = exports.getMovieTrailer = exports.getTopRatedMovies = exports.getMoviesByDuration = exports.getMoviesByGenre = exports.getMovie = exports.getMovies = void 0;
 const movie_1 = __importDefault(require("../models/movie"));
 const user_1 = __importDefault(require("../models/user"));
 const axios_1 = __importDefault(require("axios"));
@@ -28,18 +28,6 @@ const getMovies = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.getMovies = getMovies;
-// get latest movies
-const getLatestMovies = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const response = yield axios_1.default.get("https://api.themoviedb.org/3/movie/latest?api_key=30cddc8f56542b9d585e5b5c035aab19");
-        return res.status(200).json(response.data);
-    }
-    catch (error) {
-        console.log(error);
-        return res.status(500).json(error);
-    }
-});
-exports.getLatestMovies = getLatestMovies;
 // getmovie with trycatch
 const getMovie = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -114,17 +102,6 @@ const getTopRatedMovies = (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.getTopRatedMovies = getTopRatedMovies;
-const getActors = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const response = yield axios_1.default.get("https://api.themoviedb.org/3/search/multi?api_key=30cddc8f56542b9d585e5b5c035aab19&query=brad%20pitt");
-        return res.status(200).json(response.data);
-    }
-    catch (error) {
-        console.log(error);
-        return res.status(500).json(error);
-    }
-});
-exports.getActors = getActors;
 // getMovieTrailer with trycatch
 const getMovieTrailer = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -254,3 +231,26 @@ const getMovieReviews = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.getMovieReviews = getMovieReviews;
+// create a search filter for movies and tv series that can filter them by genre, duration, rating, and year
+const searchFilter = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { genre, duration, rating, year } = req.body;
+        let query = `https://api.themoviedb.org/3/discover/movie?api_key=30cddc8f56542b9d585e5b5c035aab19`;
+        if (genre)
+            query += `&with_genres=${genre}`;
+        if (duration)
+            query += `&with_runtime.gte=${duration}`;
+        if (rating)
+            query += `&vote_average.gte=${rating}`;
+        if (year)
+            query += `&primary_release_year=${year}`;
+        console.log(query);
+        const response = yield axios_1.default.get(query);
+        return res.status(200).json(response.data);
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+});
+exports.searchFilter = searchFilter;

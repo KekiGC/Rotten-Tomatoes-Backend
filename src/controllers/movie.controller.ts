@@ -16,19 +16,6 @@ export const getMovies = async (req: Request, res: Response) => {
   }
 };
 
-// get latest movies
-export const getLatestMovies = async (req: Request, res: Response) => {
-  try {
-    const response = await axios.get(
-      "https://api.themoviedb.org/3/movie/latest?api_key=30cddc8f56542b9d585e5b5c035aab19"
-    );
-    return res.status(200).json(response.data);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-};
-
 // getmovie with trycatch
 export const getMovie = async (req: Request, res: Response) => {
   try {
@@ -103,18 +90,6 @@ export const getTopRatedMovies = async (req: Request, res: Response) => {
   try {
     const response = await axios.get(
       "https://api.themoviedb.org/3/movie/top_rated?api_key=30cddc8f56542b9d585e5b5c035aab19"
-    );
-    return res.status(200).json(response.data);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-};
-
-export const getActors = async (req: Request, res: Response) => {
-  try {
-    const response = await axios.get(
-      "https://api.themoviedb.org/3/search/multi?api_key=30cddc8f56542b9d585e5b5c035aab19&query=brad%20pitt"
     );
     return res.status(200).json(response.data);
   } catch (error) {
@@ -251,6 +226,25 @@ export const getMovieReviews = async (req: Request, res: Response) => {
     const response = await axios.get(
       `https://api.themoviedb.org/3/movie/${movieId}/reviews?api_key=30cddc8f56542b9d585e5b5c035aab19`
     );
+    return res.status(200).json(response.data);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+};
+
+// create a search filter for movies and tv series that can filter them by genre, duration, rating, and year
+export const searchFilter = async (req: Request, res: Response) => {
+  try {
+    const { genre, duration, rating, year } = req.body;
+    let query = `https://api.themoviedb.org/3/discover/movie?api_key=30cddc8f56542b9d585e5b5c035aab19`;
+    
+    if (genre) query += `&with_genres=${genre}`;
+    if (duration) query += `&with_runtime.gte=${duration}`;
+    if (rating) query += `&vote_average.gte=${rating}`;
+    if (year) query += `&primary_release_year=${year}`;
+    console.log(query);
+    const response = await axios.get(query);
     return res.status(200).json(response.data);
   } catch (error) {
     console.log(error);
