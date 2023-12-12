@@ -63,7 +63,7 @@ export const getMoviesByGenre = async (req: Request, res: Response) => {
   try {
     const { genre } = req.params;
     const response = await axios.get(
-      `https://api.themoviedb.org/3/discover/movie?api_key=30cddc8f56542b9d585e5b5c035aab19&with_genres=${genre}`
+      `https://api.themoviedb.org/3/discover/movie?api_key=ddeb2fc989f1840de99b5c1371708693&with_genres=${genre}`
     );
     return res.status(200).json(response.data);
   } catch (error) {
