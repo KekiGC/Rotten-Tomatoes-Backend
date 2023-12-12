@@ -1,5 +1,5 @@
 import { Document, Schema, model } from "mongoose";
-import { IUser } from "./user";
+import { IComment } from "./comment";
 
 interface IGenre {
   id: number;
@@ -21,10 +21,7 @@ export interface IMovie extends Document {
     average: number;
     count: number;
   };
-  comments: {
-    user: IUser['_id'];
-    text: string;
-  }[];
+  comments: IComment["_id"][];
 }
 
 const movieSchema = new Schema<IMovie>({
@@ -42,12 +39,7 @@ const movieSchema = new Schema<IMovie>({
     average: { type: Number, default: 0 },
     count: { type: Number, default: 0 },
   },
-  comments: [
-    {
-      user: { type: Schema.Types.ObjectId, ref: 'User' },
-      text: { type: String, required: false },
-    },
-  ],
+  comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
 });
 
 export default model<IMovie>('Movie', movieSchema);
