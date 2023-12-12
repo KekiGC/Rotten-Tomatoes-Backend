@@ -72,12 +72,4 @@ userSchema.methods.comparePassword = function (password) {
         return yield bcrypt_1.default.compare(password, this.password);
     });
 };
-// userSchema.methods.editProfile = async function (
-//   username: string,
-//   bio: string
-// ): Promise<void> {
-//   this.username = username;
-//   this.bio = bio;
-//   await this.save();
-// };
 exports.default = (0, mongoose_1.model)("User", userSchema);

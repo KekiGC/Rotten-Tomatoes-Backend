@@ -12,14 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.searchFilter = exports.getMovieReviews = exports.getMovieByTitle = exports.getComments = exports.addComment = exports.addRating = exports.deleteMovie = exports.getMovieTrailer = exports.getTopRatedMovies = exports.getMoviesByDuration = exports.getMoviesByGenre = exports.getMovie = exports.getMovies = void 0;
+exports.movieFilter = exports.getMovieReviews = exports.getMovieByTitle = exports.addReply = exports.getComments = exports.addComment = exports.addRating = exports.deleteMovie = exports.getMovieTrailer = exports.getTopRatedMovies = exports.getMoviesByDuration = exports.getMoviesByGenre = exports.getMovie = exports.getMovies = void 0;
 const movie_1 = __importDefault(require("../models/movie"));
 const user_1 = __importDefault(require("../models/user"));
+const comment_1 = __importDefault(require("../models/comment"));
 const axios_1 = __importDefault(require("axios"));
 // get popular movies
 const getMovies = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const response = yield axios_1.default.get("https://api.themoviedb.org/3/movie/popular?api_key=30cddc8f56542b9d585e5b5c035aab19");
+        const response = yield axios_1.default.get("https://api.themoviedb.org/3/movie/popular?api_key=ddeb2fc989f1840de99b5c1371708693");
         return res.status(200).json(response.data);
     }
     catch (error) {
@@ -39,7 +40,7 @@ const getMovie = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         else {
             // Obtener la película de la API
-            const response = yield axios_1.default.get(`https://api.themoviedb.org/3/movie/${movieId}?api_key=30cddc8f56542b9d585e5b5c035aab19`);
+            const response = yield axios_1.default.get(`https://api.themoviedb.org/3/movie/${movieId}?api_key=ddeb2fc989f1840de99b5c1371708693`);
             const movieData = response.data;
             // Obtener los géneros de la respuesta de la API
             const genres = movieData.genres.map((genre) => ({
@@ -93,7 +94,7 @@ exports.getMoviesByDuration = getMoviesByDuration;
 // get top rated movies
 const getTopRatedMovies = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const response = yield axios_1.default.get("https://api.themoviedb.org/3/movie/top_rated?api_key=30cddc8f56542b9d585e5b5c035aab19");
+        const response = yield axios_1.default.get("https://api.themoviedb.org/3/movie/top_rated?api_key=ddeb2fc989f1840de99b5c1371708693");
         return res.status(200).json(response.data);
     }
     catch (error) {
@@ -106,7 +107,7 @@ exports.getTopRatedMovies = getTopRatedMovies;
 const getMovieTrailer = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { movieId } = req.params;
-        const response = yield axios_1.default.get(`https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=30cddc8f56542b9d585e5b5c035aab19`);
+        const response = yield axios_1.default.get(`https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=ddeb2fc989f1840de99b5c1371708693`);
         return res.status(200).json(response.data);
     }
     catch (error) {
@@ -136,9 +137,9 @@ const addRating = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (!movie) {
             return res.status(404).json({ msg: "Movie not found" });
         }
-        // Validar que el rating sea un número entre 1 y 5
-        if (rating < 1 || rating > 5) {
-            return res.status(400).json({ msg: "Rating must be between 1 and 5" });
+        // Validar que el rating sea un número entre 1 y 10
+        if (rating < 1 || rating > 10) {
+            return res.status(400).json({ msg: "Rating must be between 1 and 10" });
         }
         if (userId) {
             // Si se proporciona el ID del usuario, verificar si es crítico
@@ -175,9 +176,16 @@ const addComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const { movieId } = req.params;
         const { userId, text } = req.body;
         const movie = yield movie_1.default.findOne({ apiId: movieId });
-        if (!movie)
+        if (!movie) {
             return res.status(404).json({ msg: "Movie not found" });
-        movie.comments.push({ user: userId, text: text });
+        }
+        const comment = new comment_1.default({
+            user: userId,
+            text,
+            replies: [],
+        });
+        yield comment.save();
+        movie.comments.push(comment._id);
         yield movie.save();
         return res.status(200).json(movie);
     }
@@ -191,9 +199,22 @@ exports.addComment = addComment;
 const getComments = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { movieId } = req.params;
-        const movie = yield movie_1.default.findOne({ apiId: movieId });
-        if (!movie)
+        const movie = yield movie_1.default.findOne({ apiId: movieId }).populate({
+            path: 'comments',
+            populate: {
+                path: 'user',
+                select: 'username',
+            },
+        }).populate({
+            path: 'comments',
+            populate: {
+                path: 'replies.user',
+                select: 'username',
+            },
+        });
+        if (!movie) {
             return res.status(404).json({ msg: "Movie not found" });
+        }
         return res.status(200).json(movie.comments);
     }
     catch (error) {
@@ -202,10 +223,34 @@ const getComments = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.getComments = getComments;
+const addReply = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { commentId } = req.params;
+        const { userId, text } = req.body;
+        const parentComment = yield comment_1.default.findById(commentId);
+        if (!parentComment) {
+            return res.status(404).json({ msg: "Parent comment not found" });
+        }
+        const reply = new comment_1.default({
+            user: userId,
+            text,
+        });
+        yield reply.save();
+        parentComment.replies.push(reply);
+        yield parentComment.save();
+        return res.status(200).json(parentComment);
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+});
+exports.addReply = addReply;
+// get movie by title
 const getMovieByTitle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { title } = req.params;
-        const response = yield axios_1.default.get(`https://api.themoviedb.org/3/search/movie?api_key=30cddc8f56542b9d585e5b5c035aab19&query=${encodeURIComponent(title)}`);
+        const response = yield axios_1.default.get(`https://api.themoviedb.org/3/search/movie?api_key=ddeb2fc989f1840de99b5c1371708693&query=${encodeURIComponent(title)}`);
         const movieData = response.data.results; // array de películas
         if (!movieData) {
             return res.status(404).json({ msg: 'Movie not found' });
@@ -222,7 +267,7 @@ exports.getMovieByTitle = getMovieByTitle;
 const getMovieReviews = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { movieId } = req.params;
-        const response = yield axios_1.default.get(`https://api.themoviedb.org/3/movie/${movieId}/reviews?api_key=30cddc8f56542b9d585e5b5c035aab19`);
+        const response = yield axios_1.default.get(`https://api.themoviedb.org/3/movie/${movieId}/reviews?api_key=ddeb2fc989f1840de99b5c1371708693`);
         return res.status(200).json(response.data);
     }
     catch (error) {
@@ -231,20 +276,19 @@ const getMovieReviews = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.getMovieReviews = getMovieReviews;
-// create a search filter for movies and tv series that can filter them by genre, duration, rating, and year
-const searchFilter = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// filter movies by genre, duration, year and sort by
+const movieFilter = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { genre, duration, rating, year } = req.body;
-        let query = `https://api.themoviedb.org/3/discover/movie?api_key=30cddc8f56542b9d585e5b5c035aab19`;
+        const { genre, duration, year, sortBy } = req.body;
+        let query = `https://api.themoviedb.org/3/discover/movie?api_key=ddeb2fc989f1840de99b5c1371708693`;
         if (genre)
             query += `&with_genres=${genre}`;
         if (duration)
             query += `&with_runtime.gte=${duration}`;
-        if (rating)
-            query += `&vote_average.gte=${rating}`;
         if (year)
             query += `&primary_release_year=${year}`;
-        console.log(query);
+        if (sortBy)
+            query += `&sort_by=${sortBy}`;
         const response = yield axios_1.default.get(query);
         return res.status(200).json(response.data);
     }
@@ -253,4 +297,4 @@ const searchFilter = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         return res.status(500).json(error);
     }
 });
-exports.searchFilter = searchFilter;
+exports.movieFilter = movieFilter;

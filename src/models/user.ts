@@ -14,7 +14,6 @@ export interface IUser extends Document {
     rating: number;
   }[];
   comparePassword: (password: string) => Promise<boolean>;
-  // editProfile: (username: string, bio: string) => Promise<void>;
 }
 
 const userSchema = new Schema(
@@ -78,14 +77,5 @@ userSchema.methods.comparePassword = async function (
 ): Promise<boolean> {
   return await bcrypt.compare(password, this.password);
 };
-
-// userSchema.methods.editProfile = async function (
-//   username: string,
-//   bio: string
-// ): Promise<void> {
-//   this.username = username;
-//   this.bio = bio;
-//   await this.save();
-// };
 
 export default model<IUser>("User", userSchema);

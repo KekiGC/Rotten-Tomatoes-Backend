@@ -16,11 +16,6 @@ const movieSchema = new mongoose_1.Schema({
         average: { type: Number, default: 0 },
         count: { type: Number, default: 0 },
     },
-    comments: [
-        {
-            user: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User' },
-            text: { type: String, required: false },
-        },
-    ],
+    comments: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Comment' }],
 });
 exports.default = (0, mongoose_1.model)('Movie', movieSchema);
