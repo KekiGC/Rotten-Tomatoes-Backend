@@ -273,19 +273,19 @@ export const getMovieByTitle = async (req: Request, res: Response) => {
     }
   };
 
-// get movie reviews
-export const getMovieReviews = async (req: Request, res: Response) => {
-  try {
-    const { movieId } = req.params;
-    const response = await axios.get(
-      `https://api.themoviedb.org/3/movie/${movieId}/reviews?api_key=ddeb2fc989f1840de99b5c1371708693`
-    );
-    return res.status(200).json(response.data);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-};
+// get movie reviews from api
+// export const getApiReviews = async (req: Request, res: Response) => {
+//   try {
+//     const { movieId } = req.params;
+//     const response = await axios.get(
+//       `https://api.themoviedb.org/3/movie/${movieId}/reviews?api_key=ddeb2fc989f1840de99b5c1371708693`
+//     );
+//     return res.status(200).json(response.data);
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(500).json(error);
+//   }
+// };
 
 // filter movies by genre, duration, year and sort by
 export const movieFilter = async (req: Request, res: Response) => {

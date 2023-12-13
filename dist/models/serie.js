@@ -8,13 +8,17 @@ const serieSchema = new mongoose_1.Schema({
     genres: [{ type: String, required: true }],
     description: { type: String, required: true },
     trailer: { type: String, required: false },
-    publicRating: {
+    apiRating: {
         average: { type: Number, default: 0 },
         count: { type: Number, default: 0 },
     },
-    criticRating: {
-        average: { type: Number, default: 0 },
-        count: { type: Number, default: 0 },
-    },
+    seasons: [{
+            id: { type: Number, required: true },
+            name: { type: String, required: true },
+            image: { type: String, required: true },
+            episodeCount: { type: Number, required: true },
+            description: { type: String, required: true },
+            voteAverage: { type: Number, required: true }
+        }],
 });
 exports.default = (0, mongoose_1.model)('Serie', serieSchema);
