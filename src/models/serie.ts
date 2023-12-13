@@ -1,20 +1,31 @@
 import { Document, Schema, model } from "mongoose";
 
+interface IGenre {
+    id: number;
+    name: string;
+}
+
+interface ISeasons {
+    id: number;
+    name: string;
+    image: string;
+    episodeCount: number;
+    description: string;
+    voteAverage: number;
+}
+
 export interface ISerie extends Document {
     apiId: string;
     title: string;
     image: string;
-    genres: string[];
+    genres: IGenre[];
     description: string;
     trailer: string;
-    publicRating: {
+    apiRating: {
         average: number;
         count: number;
     };
-    criticRating: {
-        average: number;
-        count: number;
-    };
+    seasons: ISeasons[];
 }
 
 const serieSchema = new Schema<ISerie>({
@@ -24,14 +35,18 @@ const serieSchema = new Schema<ISerie>({
     genres: [{ type: String, required: true }],
     description: { type: String, required: true },
     trailer: { type: String, required: false },
-    publicRating: {
+    apiRating: {
         average: { type: Number, default: 0 },
         count: { type: Number, default: 0 },
     },
-    criticRating: {
-        average: { type: Number, default: 0 },
-        count: { type: Number, default: 0 },
-    },
+    seasons: [{
+        id: { type: Number, required: true },
+        name: { type: String, required: true },
+        image: { type: String, required: true },
+        episodeCount: { type: Number, required: true },
+        description: { type: String, required: true },
+        voteAverage: { type: Number, required: true }
+    }],
 });
 
 

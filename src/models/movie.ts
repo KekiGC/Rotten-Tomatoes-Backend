@@ -1,5 +1,6 @@
 import { Document, Schema, model } from "mongoose";
 import { IComment } from "./comment";
+import { IReview } from "./review";
 
 interface IGenre {
   id: number;
@@ -22,6 +23,7 @@ export interface IMovie extends Document {
     count: number;
   };
   comments: IComment["_id"][];
+  reviews: IReview["_id"][];
 }
 
 const movieSchema = new Schema<IMovie>({
@@ -40,6 +42,7 @@ const movieSchema = new Schema<IMovie>({
     count: { type: Number, default: 0 },
   },
   comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
+  reviews: [{ type: Schema.Types.ObjectId, ref: 'Review' }],
 });
 
 export default model<IMovie>('Movie', movieSchema);

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.movieFilter = exports.getMovieReviews = exports.getMovieByTitle = exports.addReply = exports.getComments = exports.addComment = exports.addRating = exports.deleteMovie = exports.getMovieTrailer = exports.getTopRatedMovies = exports.getMoviesByDuration = exports.getMoviesByGenre = exports.getMovie = exports.getMovies = void 0;
+exports.movieFilter = exports.getMovieByTitle = exports.addReply = exports.getComments = exports.addComment = exports.addRating = exports.deleteMovie = exports.getMovieTrailer = exports.getTopRatedMovies = exports.getMoviesByDuration = exports.getMoviesByGenre = exports.getMovie = exports.getMovies = void 0;
 const movie_1 = __importDefault(require("../models/movie"));
 const user_1 = __importDefault(require("../models/user"));
 const comment_1 = __importDefault(require("../models/comment"));
@@ -261,19 +261,19 @@ const getMovieByTitle = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.getMovieByTitle = getMovieByTitle;
-// get movie reviews
-const getMovieReviews = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { movieId } = req.params;
-        const response = yield axios_1.default.get(`https://api.themoviedb.org/3/movie/${movieId}/reviews?api_key=ddeb2fc989f1840de99b5c1371708693`);
-        return res.status(200).json(response.data);
-    }
-    catch (error) {
-        console.log(error);
-        return res.status(500).json(error);
-    }
-});
-exports.getMovieReviews = getMovieReviews;
+// get movie reviews from api
+// export const getApiReviews = async (req: Request, res: Response) => {
+//   try {
+//     const { movieId } = req.params;
+//     const response = await axios.get(
+//       `https://api.themoviedb.org/3/movie/${movieId}/reviews?api_key=ddeb2fc989f1840de99b5c1371708693`
+//     );
+//     return res.status(200).json(response.data);
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(500).json(error);
+//   }
+// };
 // filter movies by genre, duration, year and sort by
 const movieFilter = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {

@@ -17,5 +17,6 @@ const movieSchema = new mongoose_1.Schema({
         count: { type: Number, default: 0 },
     },
     comments: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Comment' }],
+    reviews: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Review' }],
 });
 exports.default = (0, mongoose_1.model)('Movie', movieSchema);
