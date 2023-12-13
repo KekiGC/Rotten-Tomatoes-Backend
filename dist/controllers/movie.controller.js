@@ -145,21 +145,19 @@ const addRating = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             // Si se proporciona el ID del usuario, verificar si es crítico
             const user = yield user_1.default.findById(userId);
             if (!(user === null || user === void 0 ? void 0 : user.isCritic)) {
-                return res
-                    .status(401)
-                    .json({ msg: "Only critics can add critic ratings" });
+                const newAverage = (movie.publicRating.average * movie.publicRating.count + rating) /
+                    (movie.publicRating.count + 1);
+                movie.publicRating.average = newAverage;
+                movie.publicRating.count++;
+                user === null || user === void 0 ? void 0 : user.moviesRated.push({ movie: movie._id, rating });
             }
-            const newAverage = (movie.criticRating.average * movie.criticRating.count + rating) /
-                (movie.criticRating.count + 1);
-            movie.criticRating.average = newAverage;
-            movie.criticRating.count++;
-        }
-        else {
-            // Si no se proporciona el ID del usuario, utilizar rating público
-            const newAverage = (movie.publicRating.average * movie.publicRating.count + rating) /
-                (movie.publicRating.count + 1);
-            movie.publicRating.average = newAverage;
-            movie.publicRating.count++;
+            else {
+                const newAverage = (movie.criticRating.average * movie.criticRating.count + rating) /
+                    (movie.criticRating.count + 1);
+                movie.criticRating.average = newAverage;
+                movie.criticRating.count++;
+                user === null || user === void 0 ? void 0 : user.moviesRated.push({ movie: movie._id, rating });
+            }
         }
         yield movie.save();
         return res.status(200).json(movie);

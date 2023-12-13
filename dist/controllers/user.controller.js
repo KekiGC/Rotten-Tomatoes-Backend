@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUser = exports.changePassword = exports.signIn = exports.signUp = void 0;
+exports.deleteUser = exports.changePassword = exports.getUsers = exports.getUserById = exports.signIn = exports.signUp = void 0;
 const user_1 = __importDefault(require("../models/user"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = __importDefault(require("../config/config"));
@@ -64,6 +64,34 @@ const signIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     });
 });
 exports.signIn = signIn;
+// get user by id
+const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const user = yield user_1.default.findById(id);
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+        return res.status(200).json(user);
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({ msg: "Server error" });
+    }
+});
+exports.getUserById = getUserById;
+// get all users
+const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const users = yield user_1.default.find();
+        return res.status(200).json(users);
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({ msg: "Server error" });
+    }
+});
+exports.getUsers = getUsers;
 const changePassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, currentPassword, newPassword } = req.body;
     if (!email || !currentPassword || !newPassword) {
