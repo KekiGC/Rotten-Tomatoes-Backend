@@ -59,6 +59,32 @@ export const signIn = async (req: Request, res: Response) => {
   });
 };
 
+// get user by id
+export const getUserById = async (req: Request, res: Response): Promise<Response> => {
+  try {
+      const { id } = req.params;
+      const user = await User.findById(id);
+      if (!user) {
+          return res.status(404).json({ msg: "User not found" });
+      }
+      return res.status(200).json(user);
+  } catch (error) {
+      console.log(error);
+      return res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// get all users
+export const getUsers = async (req: Request, res: Response): Promise<Response> => {
+  try {
+      const users = await User.find();
+      return res.status(200).json(users);
+  } catch (error) {
+      console.log(error);
+      return res.status(500).json({ msg: "Server error" });
+  }
+};
+
 export const changePassword = async (
   req: Request,
   res: Response
