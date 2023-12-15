@@ -15,7 +15,7 @@ router.get('/movies', getMovies)
 router.get('/movies/:movieId', getMovie)
 
 router.get('/movies/discover/:genre', getMoviesByGenre)
-router.get('/movies/duration/:duration', getMoviesByDuration)
+
 router.get('/movies/rating/toprated', getTopRatedMovies)
 router.get('/movies/search/:title', getMovieByTitle)
 
