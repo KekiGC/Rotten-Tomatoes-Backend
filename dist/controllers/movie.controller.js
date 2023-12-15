@@ -197,17 +197,19 @@ exports.addComment = addComment;
 const getComments = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { movieId } = req.params;
-        const movie = yield movie_1.default.findOne({ apiId: movieId }).populate({
-            path: 'comments',
+        const movie = yield movie_1.default.findOne({ apiId: movieId })
+            .populate({
+            path: "comments",
             populate: {
-                path: 'user',
-                select: 'username',
+                path: "user",
+                select: "username",
             },
-        }).populate({
-            path: 'comments',
+        })
+            .populate({
+            path: "comments",
             populate: {
-                path: 'replies.user',
-                select: 'username',
+                path: "replies.user",
+                select: "username",
             },
         });
         if (!movie) {
@@ -251,7 +253,7 @@ const getMovieByTitle = (req, res) => __awaiter(void 0, void 0, void 0, function
         const response = yield axios_1.default.get(`https://api.themoviedb.org/3/search/movie?api_key=ddeb2fc989f1840de99b5c1371708693&query=${encodeURIComponent(title)}`);
         const movieData = response.data.results; // array de películas
         if (!movieData) {
-            return res.status(404).json({ msg: 'Movie not found' });
+            return res.status(404).json({ msg: "Movie not found" });
         }
         return res.status(200).json(movieData);
     }
@@ -261,19 +263,6 @@ const getMovieByTitle = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.getMovieByTitle = getMovieByTitle;
-// get movie reviews from api
-// export const getApiReviews = async (req: Request, res: Response) => {
-//   try {
-//     const { movieId } = req.params;
-//     const response = await axios.get(
-//       `https://api.themoviedb.org/3/movie/${movieId}/reviews?api_key=ddeb2fc989f1840de99b5c1371708693`
-//     );
-//     return res.status(200).json(response.data);
-//   } catch (error) {
-//     console.log(error);
-//     return res.status(500).json(error);
-//   }
-// };
 // filter movies by genre, duration, year and sort by
 const movieFilter = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -288,6 +277,7 @@ const movieFilter = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         if (sortBy)
             query += `&sort_by=${sortBy}`;
         const response = yield axios_1.default.get(query);
+        console.log(response.data);
         return res.status(200).json(response.data);
     }
     catch (error) {
