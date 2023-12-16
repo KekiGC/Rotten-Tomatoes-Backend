@@ -20,7 +20,7 @@ router.post('/movies/discovery', movie_controller_1.movieFilter);
 router.post('/movies/:movieId/comments', movie_controller_1.addComment);
 router.post('/movies/:movieId/rating', movie_controller_1.addRating);
 router.post('/comments/:commentId/replies', movie_controller_1.addReply);
-router.post('/movies/:movieId/reviews', review_controller_1.createReview);
+router.post('/movies/:movieId/reviews', review_controller_1.createMovieReview);
 // Deletes
 router.delete('/movies/:movieId', movie_controller_1.deleteMovie);
 exports.default = router;

@@ -6,7 +6,7 @@ getMoviesByGenre, getTopRatedMovies, getSimilarMovies,
 addComment, getComments, getMovieByTitle, 
 movieFilter, getMovieTrailer, addReply } from '../controllers/movie.controller';
 
-import { createReview, getMovieReviews } from '../controllers/review.controller';
+import { createMovieReview, getMovieReviews } from '../controllers/review.controller';
 
 // Routes
 
@@ -30,7 +30,7 @@ router.post('/movies/discovery', movieFilter)
 router.post('/movies/:movieId/comments', addComment)
 router.post('/movies/:movieId/rating', addRating)
 router.post('/comments/:commentId/replies', addReply);
-router.post('/movies/:movieId/reviews', createReview);
+router.post('/movies/:movieId/reviews', createMovieReview);
 
 // Deletes
 router.delete('/movies/:movieId', deleteMovie)

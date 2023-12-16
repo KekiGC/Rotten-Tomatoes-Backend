@@ -183,3 +183,19 @@ export const addSerieRating = async (req: Request, res: Response) => {
       return res.status(500).json(error);
     }
   };
+
+  // get similar series
+export const getSimilarSeries = async (req: Request, res: Response) => {
+    try {
+      const { serieId } = req.params;
+  
+      const response = await axios.get(
+        `https://api.themoviedb.org/3/tv/${serieId}/similar?api_key=ddeb2fc989f1840de99b5c1371708693`
+      );
+  
+      return res.status(200).json(response.data);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(error);
+    }
+  };
