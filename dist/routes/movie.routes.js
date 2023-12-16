@@ -9,6 +9,7 @@ const review_controller_1 = require("../controllers/review.controller");
 router.get('/movies', movie_controller_1.getMovies);
 router.get('/movies/:movieId', movie_controller_1.getMovie);
 router.get('/movies/discover/:genre', movie_controller_1.getMoviesByGenre);
+router.get('/movies/:movieId/similar', movie_controller_1.getSimilarMovies);
 router.get('/movies/rating/toprated', movie_controller_1.getTopRatedMovies);
 router.get('/movies/search/:title', movie_controller_1.getMovieByTitle);
 router.get('/movies/:movieId/trailer', movie_controller_1.getMovieTrailer);
