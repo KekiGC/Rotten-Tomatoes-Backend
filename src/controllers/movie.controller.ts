@@ -143,23 +143,40 @@ export const addRating = async (req: Request, res: Response) => {
     }
 
     if (userId) {
-      // Si se proporciona el ID del usuario, verificar si es crítico
+  
       const user = await User.findById(userId);
-      if (!user?.isCritic) {
+
+      if (!user) {
+        return res.status(404).json({ msg: "User not found" });
+      }
+
+      // Verificar si el usuario ya calificó la película
+      const alreadyRated = user.moviesRated.find(
+        (ratedMovie) => ratedMovie.movie.toString() === movieId
+      );
+      if (alreadyRated) {
+        alreadyRated.rating = rating;
+      } else {
+        user.moviesRated.push({ movie: movie._id, rating });
+      }
+      
+      // verificar si el usuario es crítico
+      if (!user.isCritic) {
         const newAverage =
           (movie.publicRating.average * movie.publicRating.count + rating) /
           (movie.publicRating.count + 1);
         movie.publicRating.average = newAverage;
         movie.publicRating.count++;
-        user?.moviesRated.push({ movie: movie._id, rating });
+        
       } else {
         const newAverage =
           (movie.criticRating.average * movie.criticRating.count + rating) /
           (movie.criticRating.count + 1);
         movie.criticRating.average = newAverage;
         movie.criticRating.count++;
-        user?.moviesRated.push({ movie: movie._id, rating });
       }
+
+      await user.save();
     }
 
     await movie.save();
