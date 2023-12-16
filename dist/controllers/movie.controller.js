@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.movieFilter = exports.getMovieByTitle = exports.addReply = exports.getComments = exports.addComment = exports.addRating = exports.deleteMovie = exports.getMovieTrailer = exports.getTopRatedMovies = exports.getMoviesByDuration = exports.getMoviesByGenre = exports.getMovie = exports.getMovies = void 0;
+exports.movieFilter = exports.getMovieByTitle = exports.addReply = exports.getComments = exports.addComment = exports.addRating = exports.deleteMovie = exports.getMovieTrailer = exports.getTopRatedMovies = exports.getSimilarMovies = exports.getMoviesByGenre = exports.getMovie = exports.getMovies = void 0;
 const movie_1 = __importDefault(require("../models/movie"));
 const user_1 = __importDefault(require("../models/user"));
 const comment_1 = __importDefault(require("../models/comment"));
@@ -78,11 +78,11 @@ const getMoviesByGenre = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.getMoviesByGenre = getMoviesByGenre;
-// getmovies by duration with trycatch
-const getMoviesByDuration = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// get similar movies
+const getSimilarMovies = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { duration } = req.params;
-        const response = yield axios_1.default.get(`https://api.themoviedb.org/3/discover/movie?api_key=30cddc8f56542b9d585e5b5c035aab19&with_runtime.gte=${duration}`);
+        const { movieId } = req.params;
+        const response = yield axios_1.default.get(`https://api.themoviedb.org/3/movie/${movieId}/similar?api_key=ddeb2fc989f1840de99b5c1371708693`);
         return res.status(200).json(response.data);
     }
     catch (error) {
@@ -90,7 +90,7 @@ const getMoviesByDuration = (req, res) => __awaiter(void 0, void 0, void 0, func
         return res.status(500).json(error);
     }
 });
-exports.getMoviesByDuration = getMoviesByDuration;
+exports.getSimilarMovies = getSimilarMovies;
 // get top rated movies
 const getTopRatedMovies = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -103,7 +103,7 @@ const getTopRatedMovies = (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.getTopRatedMovies = getTopRatedMovies;
-// getMovieTrailer with trycatch
+// getMovieTrailer 
 const getMovieTrailer = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { movieId } = req.params;
@@ -116,7 +116,7 @@ const getMovieTrailer = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.getMovieTrailer = getMovieTrailer;
-// deletemovie with trycatch
+// deletemovie 
 const deleteMovie = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { movieId } = req.params;
@@ -137,7 +137,7 @@ const addRating = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (!movie) {
             return res.status(404).json({ msg: "Movie not found" });
         }
-        // Validar que el rating sea un número entre 1 y 10
+        // check if rating is between 1 and 10
         if (rating < 1 || rating > 10) {
             return res.status(400).json({ msg: "Rating must be between 1 and 10" });
         }
@@ -146,7 +146,7 @@ const addRating = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             if (!user) {
                 return res.status(404).json({ msg: "User not found" });
             }
-            // Verificar si el usuario ya calificó la película
+            // check if user already rated the movie
             const alreadyRated = user.moviesRated.find((ratedMovie) => ratedMovie.movie.toString() === movieId);
             if (alreadyRated) {
                 alreadyRated.rating = rating;
@@ -154,7 +154,7 @@ const addRating = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             else {
                 user.moviesRated.push({ movie: movie._id, rating });
             }
-            // verificar si el usuario es crítico
+            // check if user is critic
             if (!user.isCritic) {
                 const newAverage = (movie.publicRating.average * movie.publicRating.count + rating) /
                     (movie.publicRating.count + 1);

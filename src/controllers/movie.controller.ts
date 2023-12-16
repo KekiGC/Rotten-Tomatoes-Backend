@@ -74,12 +74,12 @@ export const getMoviesByGenre = async (req: Request, res: Response) => {
   }
 };
 
-// getmovies by duration with trycatch
-export const getMoviesByDuration = async (req: Request, res: Response) => {
+// get similar movies
+export const getSimilarMovies = async (req: Request, res: Response) => {
   try {
-    const { duration } = req.params;
+    const { movieId } = req.params;
     const response = await axios.get(
-      `https://api.themoviedb.org/3/discover/movie?api_key=30cddc8f56542b9d585e5b5c035aab19&with_runtime.gte=${duration}`
+      `https://api.themoviedb.org/3/movie/${movieId}/similar?api_key=ddeb2fc989f1840de99b5c1371708693`
     );
     return res.status(200).json(response.data);
   } catch (error) {
@@ -101,7 +101,7 @@ export const getTopRatedMovies = async (req: Request, res: Response) => {
   }
 };
 
-// getMovieTrailer with trycatch
+// getMovieTrailer 
 export const getMovieTrailer = async (req: Request, res: Response) => {
   try {
     const { movieId } = req.params;
@@ -115,7 +115,7 @@ export const getMovieTrailer = async (req: Request, res: Response) => {
   }
 };
 
-// deletemovie with trycatch
+// deletemovie 
 export const deleteMovie = async (req: Request, res: Response) => {
   try {
     const { movieId } = req.params;
@@ -137,7 +137,7 @@ export const addRating = async (req: Request, res: Response) => {
       return res.status(404).json({ msg: "Movie not found" });
     }
 
-    // Validar que el rating sea un número entre 1 y 10
+    // check if rating is between 1 and 10
     if (rating < 1 || rating > 10) {
       return res.status(400).json({ msg: "Rating must be between 1 and 10" });
     }
@@ -150,7 +150,7 @@ export const addRating = async (req: Request, res: Response) => {
         return res.status(404).json({ msg: "User not found" });
       }
 
-      // Verificar si el usuario ya calificó la película
+      // check if user already rated the movie
       const alreadyRated = user.moviesRated.find(
         (ratedMovie) => ratedMovie.movie.toString() === movieId
       );
@@ -160,7 +160,7 @@ export const addRating = async (req: Request, res: Response) => {
         user.moviesRated.push({ movie: movie._id, rating });
       }
       
-      // verificar si el usuario es crítico
+      // check if user is critic
       if (!user.isCritic) {
         const newAverage =
           (movie.publicRating.average * movie.publicRating.count + rating) /
