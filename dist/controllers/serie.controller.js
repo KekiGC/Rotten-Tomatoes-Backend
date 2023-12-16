@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSerieComments = exports.addSerieComment = exports.addSerieRating = exports.deleteSerie = exports.getSerie = exports.serieFilter = void 0;
+exports.getSimilarSeries = exports.getSerieComments = exports.addSerieComment = exports.addSerieRating = exports.deleteSerie = exports.getSerie = exports.serieFilter = void 0;
 const serie_1 = __importDefault(require("../models/serie"));
 const user_1 = __importDefault(require("../models/user"));
 const comment_1 = __importDefault(require("../models/comment"));
@@ -181,3 +181,16 @@ const getSerieComments = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.getSerieComments = getSerieComments;
+// get similar series
+const getSimilarSeries = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { serieId } = req.params;
+        const response = yield axios_1.default.get(`https://api.themoviedb.org/3/tv/${serieId}/similar?api_key=ddeb2fc989f1840de99b5c1371708693`);
+        return res.status(200).json(response.data);
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+});
+exports.getSimilarSeries = getSimilarSeries;
