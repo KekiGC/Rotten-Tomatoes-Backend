@@ -131,9 +131,9 @@ const deleteMovie = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 exports.deleteMovie = deleteMovie;
 const addRating = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { Id } = req.params;
+        const { movieId } = req.params;
         const { rating, userId } = req.body;
-        const movie = yield movie_1.default.findOne({ apiId: Id });
+        const movie = yield movie_1.default.findOne({ apiId: movieId });
         if (!movie) {
             return res.status(404).json({ msg: "Movie not found" });
         }
@@ -147,7 +147,7 @@ const addRating = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 return res.status(404).json({ msg: "User not found" });
             }
             // check if user already rated the movie
-            const alreadyRated = user.moviesRated.find((ratedMovie) => ratedMovie.movie.toString() === Id);
+            const alreadyRated = user.moviesRated.find((ratedMovie) => ratedMovie.movie.toString() === movieId);
             if (alreadyRated) {
                 alreadyRated.rating = rating;
             }
@@ -181,9 +181,9 @@ exports.addRating = addRating;
 // add comment with trycatch
 const addComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { Id } = req.params;
+        const { movieId } = req.params;
         const { userId, text } = req.body;
-        const movie = yield movie_1.default.findOne({ apiId: Id });
+        const movie = yield movie_1.default.findOne({ apiId: movieId });
         if (!movie) {
             return res.status(404).json({ msg: "Movie not found" });
         }
@@ -206,8 +206,8 @@ exports.addComment = addComment;
 // get the comments of a movie
 const getComments = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { Id } = req.params;
-        const movie = yield movie_1.default.findOne({ apiId: Id })
+        const { movieId } = req.params;
+        const movie = yield movie_1.default.findOne({ apiId: movieId })
             .populate({
             path: "comments",
             populate: {
