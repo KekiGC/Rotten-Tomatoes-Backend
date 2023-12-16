@@ -142,22 +142,32 @@ const addRating = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return res.status(400).json({ msg: "Rating must be between 1 and 10" });
         }
         if (userId) {
-            // Si se proporciona el ID del usuario, verificar si es crítico
             const user = yield user_1.default.findById(userId);
-            if (!(user === null || user === void 0 ? void 0 : user.isCritic)) {
+            if (!user) {
+                return res.status(404).json({ msg: "User not found" });
+            }
+            // Verificar si el usuario ya calificó la película
+            const alreadyRated = user.moviesRated.find((ratedMovie) => ratedMovie.movie.toString() === movieId);
+            if (alreadyRated) {
+                alreadyRated.rating = rating;
+            }
+            else {
+                user.moviesRated.push({ movie: movie._id, rating });
+            }
+            // verificar si el usuario es crítico
+            if (!user.isCritic) {
                 const newAverage = (movie.publicRating.average * movie.publicRating.count + rating) /
                     (movie.publicRating.count + 1);
                 movie.publicRating.average = newAverage;
                 movie.publicRating.count++;
-                user === null || user === void 0 ? void 0 : user.moviesRated.push({ movie: movie._id, rating });
             }
             else {
                 const newAverage = (movie.criticRating.average * movie.criticRating.count + rating) /
                     (movie.criticRating.count + 1);
                 movie.criticRating.average = newAverage;
                 movie.criticRating.count++;
-                user === null || user === void 0 ? void 0 : user.moviesRated.push({ movie: movie._id, rating });
             }
+            yield user.save();
         }
         yield movie.save();
         return res.status(200).json(movie);
