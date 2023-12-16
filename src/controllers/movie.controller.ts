@@ -129,10 +129,10 @@ export const deleteMovie = async (req: Request, res: Response) => {
 
 export const addRating = async (req: Request, res: Response) => {
   try {
-    const { movieId } = req.params;
+    const { Id } = req.params;
     const { rating, userId } = req.body;
 
-    const movie = await Movie.findOne({ apiId: movieId });
+    const movie = await Movie.findOne({ apiId: Id });
     if (!movie) {
       return res.status(404).json({ msg: "Movie not found" });
     }
@@ -152,7 +152,7 @@ export const addRating = async (req: Request, res: Response) => {
 
       // check if user already rated the movie
       const alreadyRated = user.moviesRated.find(
-        (ratedMovie) => ratedMovie.movie.toString() === movieId
+        (ratedMovie) => ratedMovie.movie.toString() === Id
       );
       if (alreadyRated) {
         alreadyRated.rating = rating;
@@ -190,10 +190,10 @@ export const addRating = async (req: Request, res: Response) => {
 // add comment with trycatch
 export const addComment = async (req: Request, res: Response) => {
   try {
-    const { movieId } = req.params;
+    const { Id } = req.params;
     const { userId, text } = req.body;
 
-    const movie: IMovie | null = await Movie.findOne({ apiId: movieId });
+    const movie: IMovie | null = await Movie.findOne({ apiId: Id });
     if (!movie) {
       return res.status(404).json({ msg: "Movie not found" });
     }
@@ -218,9 +218,9 @@ export const addComment = async (req: Request, res: Response) => {
 // get the comments of a movie
 export const getComments = async (req: Request, res: Response) => {
   try {
-    const { movieId } = req.params;
+    const { Id } = req.params;
 
-    const movie: IMovie | null = await Movie.findOne({ apiId: movieId })
+    const movie: IMovie | null = await Movie.findOne({ apiId: Id })
       .populate({
         path: "comments",
         populate: {

@@ -4,31 +4,73 @@ import axios from "axios";
 
 // serie filter
 export const serieFilter = async (req: Request, res: Response) => {
-    try {
-        const { genre, duration, year, sortBy } = req.body;
-        let query = `https://api.themoviedb.org/3/discover/tv?api_key=ddeb2fc989f1840de99b5c1371708693`;
+  try {
+    const { genre, duration, year, sortBy } = req.body;
+    let query = `https://api.themoviedb.org/3/discover/tv?api_key=ddeb2fc989f1840de99b5c1371708693`;
 
-        if (genre) query += `&with_genres=${genre}`;
-        if (duration) query += `&with_runtime.gte=${duration}`;
-        if (year) query += `&first_air_date_year=${year}`;
-        if (sortBy) query += `&sort_by=${sortBy}`;
+    if (genre) query += `&with_genres=${genre}`;
+    if (duration) query += `&with_runtime.gte=${duration}`;
+    if (year) query += `&first_air_date_year=${year}`;
+    if (sortBy) query += `&sort_by=${sortBy}`;
 
-        const response = await axios.get(query);
-        return res.status(200).json(response.data);
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json(error);
-    }
+    const response = await axios.get(query);
+    return res.status(200).json(response.data);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
 };
 
 // get serie by id
 export const getSerie = async (req: Request, res: Response) => {
-    try {
-        const { serieId } = req.params;
-        const response = await axios.get(`https://api.themoviedb.org/3/tv/${serieId}?api_key=ddeb2fc989f1840de99b5c1371708693`);
-        return res.status(200).json(response.data);
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json(error);
+  try {
+    const { serieId } = req.params;
+
+    // verificar si la serie ya existe en la base de datos
+    const existingSerie = await Serie.findOne({ apiId: serieId });
+    if (existingSerie) {
+      return res.status(200).json(existingSerie);
+    } else {
+      const response = await axios.get(
+        `https://api.themoviedb.org/3/tv/${serieId}?api_key=ddeb2fc989f1840de99b5c1371708693`
+      );
+      const serieData = response.data;
+      console.log(serieData.seasons);
+
+      const genres = serieData.genres.map(
+        (genre: { id: number; name: string }) => ({
+          id: genre.id,
+          name: genre.name,
+        })
+      );
+
+      // guardar la serie en la base de datos
+      const serie = new Serie({
+        apiId: serieData.id,
+        name: serieData.name,
+        image: `https://image.tmdb.org/t/p/w500${serieData.poster_path}`,
+        genres: genres,
+        description: serieData.overview,
+        seasons: serieData.seasons,
+      });
+
+      await serie.save();
+      return res.status(200).json(serieData);
     }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+};
+
+// delete serie by id
+export const deleteSerie = async (req: Request, res: Response) => {
+  try {
+    const { serieId } = req.params;
+    await Serie.findOneAndDelete({ apiId: serieId });
+    return res.status(200).json({ msg: "Serie deleted successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
 };
