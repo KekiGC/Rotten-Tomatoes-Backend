@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
-import Serie from "../models/serie";
+import Serie, { ISerie } from "../models/serie";
+import User from "../models/user";
+import Comment from "../models/comment";
 import axios from "axios";
 
 // serie filter
@@ -74,3 +76,110 @@ export const deleteSerie = async (req: Request, res: Response) => {
     return res.status(500).json(error);
   }
 };
+
+export const addSerieRating = async (req: Request, res: Response) => {
+    try {
+      const { serieId } = req.params;
+      const { rating, userId } = req.body;
+  
+      const serie = await Serie.findOne({ apiId: serieId });
+      if (!serie) {
+        return res.status(404).json({ msg: "Serie not found" });
+      }
+  
+      // check if rating is between 1 and 10
+      if (rating < 1 || rating > 10) {
+        return res.status(400).json({ msg: "Rating must be between 1 and 10" });
+      }
+  
+      if (userId) {
+    
+        const user = await User.findById(userId);
+  
+        if (!user) {
+          return res.status(404).json({ msg: "User not found" });
+        }
+  
+
+        // check if user is critic
+        if (!user.isCritic) {
+          const newAverage =
+            (serie.publicRating.average * serie.publicRating.count + rating) /
+            (serie.publicRating.count + 1);
+          serie.publicRating.average = newAverage;
+          serie.publicRating.count++;
+          
+        } else {
+          const newAverage =
+            (serie.criticRating.average * serie.criticRating.count + rating) /
+            (serie.criticRating.count + 1);
+          serie.criticRating.average = newAverage;
+          serie.criticRating.count++;
+        }
+  
+      }
+  
+      await serie.save();
+      return res.status(200).json(serie);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(error);
+    }
+  };
+
+  export const addSerieComment = async (req: Request, res: Response) => {
+    try {
+      const { serieId } = req.params;
+      const { userId, text } = req.body;
+  
+      const serie: ISerie | null = await Serie.findOne({ apiId: serieId });
+      if (!serie) {
+        return res.status(404).json({ msg: "Serie not found" });
+      }
+  
+      const comment = new Comment({
+        user: userId,
+        text,
+        replies: [],
+      });
+      await comment.save();
+  
+      serie.comments.push(comment._id);
+      await serie.save();
+  
+      return res.status(200).json(serie);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(error);
+    }
+  };
+
+  export const getSerieComments = async (req: Request, res: Response) => {
+    try {
+      const { serieId } = req.params;
+  
+      const serie: ISerie | null = await Serie.findOne({ apiId: serieId })
+        .populate({
+          path: "comments",
+          populate: {
+            path: "user",
+            select: "username",
+          },
+        })
+        .populate({
+          path: "comments",
+          populate: {
+            path: "replies.user",
+            select: "username",
+          },
+        });
+      if (!serie) {
+        return res.status(404).json({ msg: "Serie not found" });
+      }
+  
+      return res.status(200).json(serie.comments);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(error);
+    }
+  };
